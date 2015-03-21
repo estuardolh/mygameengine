@@ -132,6 +132,9 @@ engine.map = function( name, width, height ){
 	};
 };
 engine.current_map = null;
+engine.setMap = function( map ){
+	engine.current_map  = map;
+}
 
 engine.viewport = {};
 engine.viewport.enabled = false;
