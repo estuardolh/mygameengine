@@ -74,6 +74,33 @@ engine.events.iskeydown = function( key ){
 	return false;
 };
 
+engine.events.touch_x = 0;
+engine.events.touch_y = 0;
+engine.events.click_x = 0;
+engine.events.click_y = 0;
+
+/*
+get x, y -absolute- positions through Click or Touch
+*/
+function doTouchStart( event ){
+	event.preventDefault();
+	engine.events.touch_x = event.targetTouches[0].pageX;
+	engine.events.touch_y = event.targetTouches[0].pageY;
+}
+function doTouchEnd( event ){
+	event.preventDefault();
+	engine.events.touch_x = -1;
+	engine.events.touch_y = -1;
+}
+function doClickStart( event ){
+	engine.events.click_x = event.clientX;
+	engine.events.click_y = event.clientY;
+}
+function doClickEnd( event ){
+	engine.events.click_x = -1;
+	engine.events.click_y = -1;
+}
+
 /*
  Object container drawable, updatable.
  
@@ -302,6 +329,11 @@ engine.entity = function Entity(key, x, y){
 
 engine.start = function(){
 	engine.canvas = document.getElementById( "screen" );
+	engine.canvas.addEventListener("touchstart", doTouchStart, false);
+	engine.canvas.addEventListener("touchend", doTouchEnd, false);
+	engine.canvas.addEventListener("mousedown", doClickStart, false);
+	engine.canvas.addEventListener("mouseup", doClickEnd, false);
+
 	engine.load();
 	engine.image.load_them();
 	
