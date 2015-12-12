@@ -195,10 +195,31 @@ engine.viewport.followTo = function( entity ){
 };
 
 engine.image = {};
-engine.image.draw = function( key, x, y){
+engine.image.draw = function( key, x, y, optional_angle, optional_width, optional_height){
+	optional_angle = ( typeof optional_angle === 'undefined' ) ? 0 : optional_angle;
+	optional_height = ( typeof optional_height === 'undefined' ) ? 0 : optional_height;
+	optional_width = ( typeof optional_width === 'undefined' ) ? 0 : optional_width;
+	
 	var img = engine.image.get(key);	
 
-	engine.canvas.getContext("2d").drawImage( img.img, parseInt(x), parseInt(y) );
+	// rotate here
+	if( optional_angle != 0 ){
+		engine.canvas.getContext("2d").save();
+		
+		if( optional_width != 0 && optional_height != 0 ){
+			engine.canvas.getContext("2d").translate( parseInt(x), parseInt(y) );
+		}
+		
+		engine.canvas.getContext("2d").rotate( optional_angle * Math.PI / 180 );
+	}
+	
+	// draw here
+	if( optional_angle != 0 ){
+		engine.canvas.getContext("2d").drawImage( img.img, - parseInt(optional_width / 2), - parseInt(optional_height / 2));
+		engine.canvas.getContext("2d").restore();
+	}else{
+		engine.canvas.getContext("2d").drawImage( img.img, parseInt(x), parseInt(y) );
+	}
 };
 engine.image.sprites = [];
 engine.image.sprites_loaded = 0;
@@ -243,6 +264,7 @@ engine.entity = function Entity(key, x, y){
 	this.h = 32;
 	this.key = key;
 	this.tag = "";
+	this.angle = -1; // degrees!
 	
 	this.dx = 0;
 	this.dy = 0;
@@ -295,10 +317,19 @@ engine.entity = function Entity(key, x, y){
 					this.animation_running = true;
 				}
 			}else{
-				engine.image.draw( key, this.x - engine.viewport.x, this.y - engine.viewport.y );
+				if( this.angle == 0 ){
+					engine.image.draw( key, this.x - engine.viewport.x, this.y - engine.viewport.y );
+				}else{
+					engine.image.draw( key, this.x - engine.viewport.x, this.y - engine.viewport.y, this.angle, this.w, this.h );
+				}
 			}
 		}else{
-			engine.image.draw( this.key, this.x, this.y);
+			
+			if( this.angle != -1 ){
+				engine.image.draw( this.key, this.x, this.y, this.angle, this.w, this.h);
+			}else{
+				engine.image.draw( this.key, this.x, this.y );
+			}
 		}
 	};
 	this.update = function(){
@@ -342,6 +373,6 @@ engine.start = function(){
 		engine.update();
 		engine.draw();
 		//console.log("tick");
-	}, 60/1000 );
+	}, 1000/30 );
 	engine.msg("engine loaded");
 };
