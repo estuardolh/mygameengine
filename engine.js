@@ -358,6 +358,32 @@ engine.entity = function Entity(key, x, y){
 	}
 }
 
+engine.math = {};
+/*
+	vector to angle
+	@x, @y: x, y components
+	
+	return angle in degrees
+*/
+engine.math.xy_to_angle = function( x, y ){
+	var radians = Math.atan( x / y );
+	var degrees = radians * ( 180 / Math.PI );
+	
+	return ( degrees < 0 ? 360 - degrees : degrees );
+};
+/*
+	vector to angle
+	@degrees: angle in degrees
+	@magnitude: magnitude of vector
+	
+	return array [x, y]
+*/
+engine.math.angle_to_xy = function( degrees, magnitude ){
+	var radians = degrees * ( Math.PI / 180 );
+		
+	return [ Math.cos( radians ) * magnitude, Math.sin( radians ) *  magnitude ];
+}
+
 engine.start = function(){
 	engine.canvas = document.getElementById( "screen" );
 	engine.canvas.addEventListener("touchstart", doTouchStart, false);
